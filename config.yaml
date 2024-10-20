@@ -32,6 +32,11 @@ points:
     matrix:
       key.padding: ky
       columns:
+        outer:
+          key:
+            stagger: 0 ky
+            spread: kx
+            column_net: col_pinky
         pinky:
           key:
             stagger: 0 ky
@@ -39,57 +44,40 @@ points:
             column_net: col_pinky
         ring:
           key:
-            stagger: 0.7 ky
+            stagger: 0 ky
             spread: kx
             column_net: col_ring
         middle:
           key:
-            stagger: 0.2 ky
+            stagger: 0 ky
             spread: kx
             column_net: col_middle
         index:
           key:
-            stagger: -0.2 ky
+            stagger: 0 ky
             spread: kx
             column_net: col_index
         inner:
           key:
-            stagger: -0.1 ky
+            stagger: -0 ky
+            spread: kx
+            column_net: col_inner
+        inner2:
+          key:
+            stagger: -0 ky
             spread: kx
             column_net: col_inner
       rows:
+        ctrl:
+          row_net: row_bottom
         bottom:
           row_net: row_bottom
         home:
           row_net: row_home
         top:
           row_net: row_top
-    thumbfan:
-      anchor:
-        ref: matrix_inner_bottom
-        shift: [-0.5 kx, -1 ky]
-      columns:
-        near:
-          key:
-            spread: kx
-            splay: -15
-            origin: [-0.5 kx, -0.5 ky]
-            column_net: col_middle
-        home:
-          key:
-            spread: kx
-            splay: -15
-            origin: [-0.5 kx, -0.5 ky]
-            column_net: col_index
-        far:
-          key:
-            spread: kx
-            splay: -15
-            origin: [-0.5 kx, -0.5 ky]
-            column_net: col_inner
-      rows:
-        thumb:
-          row_net: row_thumb
+        numbers:
+          row_net: row_top
 outlines:
   # board dimensions according to JLCPCB: 122.28 mm x 101.05 mm
   raw:
@@ -98,21 +86,6 @@ outlines:
       asym: source
       size: [kx + px, ky + py]
       corner: px
-  thumbfan_glue:
-    - what: polygon
-      points:
-        - ref: matrix_inner_bottom
-          shift: [0.5 kx + 0.5px, -0.5 ky + 0.5 py]
-        - ref: thumbfan_far_thumb
-          shift: [0.5 kx - 0.5px, 0.5 ky + 0.5 py]
-        - ref: thumbfan_far_thumb
-          shift: [0.5 kx - 0.5px, -0.5 ky - 0.5 py]
-        - ref: thumbfan_near_thumb
-          shift: [-0.5 kx + 0.5 px, -0.5 ky - 0.5 py]
-        - ref: matrix_pinky_bottom
-          shift: [0.5 kx - 0.5 py, -0.5 ky - 0.5 py]
-        - ref: matrix_pinky_home
-        - ref: matrix_inner_home
   patch_outer:
     - what: polygon
       points:
@@ -154,7 +127,6 @@ outlines:
     - "raw"
     - "+patch_inner"
     - "+patch_outer"
-    - "+thumbfan_glue"
   base_outline:
     - "keywell"
     - "+controller_area"
@@ -183,12 +155,6 @@ outlines:
         - ref: matrix_index_bottom
           shift: [0, -1.06 ky]
       radius: 1.05
-    thumb:
-      what: circle
-      where:
-        - ref: thumbfan_far_thumb
-          shift: [-0.55 kx, 0]
-      radius: 1.05
   mounting_holes:
     $extends: outlines.screw_holes
     top_left:
@@ -198,8 +164,6 @@ outlines:
     top_right:
       radius: 2.05
     palm:
-      radius: 2.05
-    thumb:
       radius: 2.05
   bottom_outline:
     - "base_outline"
