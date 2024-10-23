@@ -91,32 +91,38 @@ outlines:
       asym: source
       size: [kx + px, ky + py]
       corner: px
-  patch_outer:
-    - what: polygon
-      points:
-        - ref: matrix_pinky_top
-        - ref: matrix_pinky_bottom
-        - ref: matrix_backspace_bottom
-          shift: [-0.5 (kx + px), 0]
-        - ref: matrix_backspace_top
-          shift: [-0.5 (kx + px), 0]
-  patch_inner:
-    - what: polygon
-      points:
-        - ref: matrix_inner2_top
-          shift: [0.5 (kx + px), 0]
-        - ref: matrix_inner2_bottom
-          shift: [0.5 (kx + px), 0]
-        - ref: matrix_inner_bottom
-        - ref: matrix_inner_top
+  # patch_outer:
+  #   - what: polygon
+  #     points:
+  #       - ref: matrix_pinky_top
+  #       - ref: matrix_pinky_bottom
+  #       - ref: matrix_backspace_bottom
+  #         shift: [-0.5 (kx + px), 0]
+  #       - ref: matrix_backspace_top
+  #         shift: [-0.5 (kx + px), 0]
+  # patch_inner:
+  #   - what: polygon
+  #     points:
+  #       - ref: matrix_inner2_top
+  #         shift: [0.5 (kx + px), 0]
+  #       - ref: matrix_inner2_bottom
+  #         shift: [0.5 (kx + px), 0]
+  #       - ref: matrix_inner_bottom
+  #       - ref: matrix_inner_top
   controller_area:
     - what: rectangle
       where:
         - ref: matrix_inner2_top
           # re-tranalte to new anchor position
-          shift: [32/2 + 0 kx, 76.5/2 - 4.05 ky]
-      size: [32, 76.5]
+          shift: [-56/2 + .5kx + 1, 30/2 + 1.5ky - 3]
+      size: [56, 30]
       corner: px
+  # patch_controller:
+  #   - what: polygon
+  #     points:
+  #       - ref: controller_area
+  #       - ref: matrix_number_top
+  #       - ref: matrix_backspace_top
   switches:
     - what: rectangle
       where: true
@@ -130,11 +136,12 @@ outlines:
       corner: 1
   keywell:
     - "raw"
-    - "+patch_inner"
-    - "+patch_outer"
+    # - "+patch_inner"
+    # - "+patch_outer"
   base_outline:
     - "keywell"
     - "+controller_area"
+    # - "+patch_controller"
   screw_holes:
     top_left:
       what: circle
@@ -232,8 +239,8 @@ pcbs:
         where:
           ref:
             - matrix_inner2_top
-          shift: [20, -11]
-          rotate: 270
+          shift: [-24, 38]
+          rotate: 0
         params:
           orientation: up
           P3: row_number
@@ -254,45 +261,45 @@ pcbs:
         where:
           ref:
             - matrix_inner2_top
-          shift: [22.5, -12.25]
-          rotate: 270
+          shift: [-25.25, 40.5]
+          rotate: 0
         params:
           orientation: down
-      pad_plus:
-        what: pad
-        where:
-          ref:
-            - matrix_inner2_top
-          shift: [23, -6]
-          rotate: 0
-        params:
-          front: true
-          back: true
-          width: 1.5
-          height: 1.5
-          text: "B+"
-          net: Bplus
-      pad_minus:
-        what: pad
-        where:
-          ref:
-            - matrix_inner2_top
-          shift: [23, -3]
-          rotate: 0
-        params:
-          front: true
-          back: true
-          width: 1.5
-          height: 1.5
-          text: "B-"
-          net: GND
+      # pad_plus:
+      #   what: pad
+      #   where:
+      #     ref:
+      #       - matrix_inner2_top
+      #     shift: [-6, 23]
+      #     rotate: 0
+      #   params:
+      #     front: true
+      #     back: true
+      #     width: 1.5
+      #     height: 1.5
+      #     text: "B+"
+      #     net: Bplus
+      # pad_minus:
+      #   what: pad
+      #   where:
+      #     ref:
+      #       - matrix_inner2_top
+      #     shift: [-3, 23]
+      #     rotate: 0
+      #   params:
+      #     front: true
+      #     back: true
+      #     width: 1.5
+      #     height: 1.5
+      #     text: "B-"
+      #     net: GND
       trrs:
         what: trrs_tight
         where:
           ref:
-            - matrix_inner2_bottom
-          shift: [32, -15]
-          rotate: 270
+            - matrix_inner2_top
+          shift: [2, 50]
+          rotate: 0
         params:
           reverse: true
           symmetric: false
@@ -301,79 +308,79 @@ pcbs:
           B: VCC
           C: GND
           D: P0
-      jumper_l:
-        what: jumper
-        where:
-          ref:
-            - matrix_inner2_bottom
-          shift: [23.5, 0]
-          rotate: 270
-        params:
-          side: B
-          from: Bplus
-          to: RAW
-      jumper_r:
-        what: jumper
-        where:
-          ref:
-            - matrix_inner2_bottom
-          shift: [23.5, 0]
-          rotate: 270
-        params:
-          side: F
-          from: Bplus
-          to: RAW
-      slider_l:
-        what: slider_threeway
-        where:
-          ref:
-            - matrix_inner2_bottom
-          shift: [30, 0]
-          rotate: 270
-        params:
-          side: F
-          from: RAW
-          left: Bplus
-          right: ''
-      slider_r:
-        what: slider_threeway
-        where:
-          ref:
-            - matrix_inner2_bottom
-          shift: [30, 0]
-          rotate: 270
-        params:
-          side: B
-          from: RAW
-          left: ''
-          right: Bplus
-      reset:
-        what: reset_button
-        where:
-          ref:
-            - matrix_inner2_bottom
-          shift: [17, 0]
-          rotate: 270
-        params:
-          from: GND
-          to: RST
+      # jumper_l:
+      #   what: jumper
+      #   where:
+      #     ref:
+      #       - matrix_inner2_bottom
+      #     shift: [0,23.5]
+      #     rotate: 270
+      #   params:
+      #     side: B
+      #     from: Bplus
+      #     to: RAW
+      # jumper_r:
+      #   what: jumper
+      #   where:
+      #     ref:
+      #       - matrix_inner2_bottom
+      #     shift: [0, 23.5]
+      #     rotate: 270
+      #   params:
+      #     side: F
+      #     from: Bplus
+      #     to: RAW
+      # slider_l:
+      #   what: slider_threeway
+      #   where:
+      #     ref:
+      #       - matrix_inner2_bottom
+      #     shift: [0, 30]
+      #     rotate: 270
+      #   params:
+      #     side: F
+      #     from: RAW
+      #     left: Bplus
+      #     right: ''
+      # slider_r:
+      #   what: slider_threeway
+      #   where:
+      #     ref:
+      #       - matrix_inner2_bottom
+      #     shift: [0, 30]
+      #     rotate: 270
+      #   params:
+      #     side: B
+      #     from: RAW
+      #     left: ''
+      #     right: Bplus
+      # reset:
+      #   what: reset_button
+      #   where:
+      #     ref:
+      #       - matrix_inner2_bottom
+      #     shift: [0, 17]
+      #     rotate: 270
+      #   params:
+      #     from: GND
+      #     to: RST
       info_l:
         what: text
         where:
           ref:
-            - matrix_backspace_bottom
-          shift: [0.75 kx, 0]
+            - matrix_inner2_number
+          shift: [-.25kx, .75ky]
         params:
-          text: "samoklava v0.3\\nby soundmonster"
+          text: "orthosplit75 v0.1\\nby unseenforce"
           justify: left
       info_r:
         what: text
         where:
           ref:
-            - matrix_backspace_bottom
-          shift: [0.75 kx, 0]
+            - matrix_inner2_number
+          shift: [-0.25 kx, .75ky]
         params:
           layer: B.SilkS
-          text: "samoklava v0.3\\nby soundmonster"
+          text: "orthosplit75 v0.1\\nby unseenforce"
           justify: right mirror
 

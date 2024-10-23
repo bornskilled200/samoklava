@@ -18,6 +18,14 @@ output/pcbs/%.dsn: output/pcbs/%.kicad_pcb
 	if [ -f "$@" ] ; then rm $@ ; fi
 	${container_cmd} run ${container_args} soundmonster/kicad-automation-scripts:latest /usr/lib/python2.7/dist-packages/kicad-automation/pcbnew_automation/export_dsn.py $< $@
 
+output/pcbs/%-front.png: output/pcbs/%.kicad_pcb
+	mkdir -p $(shell dirname $@)
+	${container_cmd} run ${container_args} --entrypoint /usr/local/bin/pcbdraw yaqwsx/kikit:v1.3.0 plot --side front --style oshpark-afterdark $< $@
+
+output/pcbs/%-back.png: output/pcbs/%.kicad_pcb
+	mkdir -p $(shell dirname $@)
+	${container_cmd} run ${container_args} --entrypoint /usr/local/bin/pcbdraw yaqwsx/kikit:v1.3.0 plot --side back --style oshpark-afterdark $< $@
+
 output/routed_pcbs/%.ses: output/pcbs/%.dsn
 	mkdir -p $(shell dirname $@)
 	${container_cmd} run ${container_args} soundmonster/freerouting_cli:v0.1.0 java -jar /opt/freerouting_cli.jar -de $< -do $@
@@ -48,6 +56,8 @@ clean:
 	rm -rf output
 
 all: \
+	output/pcbs/board-front.png \
+	output/pcbs/board-back.png \
 	output/routed_pcbs/board-front.png \
 	output/routed_pcbs/board-back.png \
 	output/gerbers/top_plate/gerbers.zip \
