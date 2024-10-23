@@ -2,7 +2,7 @@ meta:
   engine: 4.0.4
   name: samoklava
   version: 0.3
-  author: soundmonster
+  author: soundmonnster
   url: https://github.com/soundmonster/samoklava
 units:
   kx: cx
@@ -32,11 +32,16 @@ points:
     matrix:
       key.padding: ky
       columns:
-        outer:
+        backspace:
           key:
             stagger: 0 ky
             spread: kx
-            column_net: col_pinky
+            column_net: col_backspace
+        caps:
+          key:
+            stagger: 0 ky
+            spread: kx
+            column_net: col_caps
         pinky:
           key:
             stagger: 0 ky
@@ -54,7 +59,7 @@ points:
             column_net: col_middle
         index:
           key:
-            stagger: 0 ky
+            stagger: -0 ky
             spread: kx
             column_net: col_index
         inner:
@@ -66,18 +71,18 @@ points:
           key:
             stagger: -0 ky
             spread: kx
-            column_net: col_inner
+            column_net: col_inner2
       rows:
         ctrl:
-          row_net: row_bottom
+          row_net: row_ctrl
         bottom:
           row_net: row_bottom
         home:
           row_net: row_home
         top:
           row_net: row_top
-        numbers:
-          row_net: row_top
+        number:
+          row_net: row_number
 outlines:
   # board dimensions according to JLCPCB: 122.28 mm x 101.05 mm
   raw:
@@ -89,28 +94,28 @@ outlines:
   patch_outer:
     - what: polygon
       points:
-        - ref: matrix_ring_top
-        - ref: matrix_ring_bottom
-        - ref: matrix_pinky_bottom
-          shift: [-0.5 (kx + px), 0]
         - ref: matrix_pinky_top
+        - ref: matrix_pinky_bottom
+        - ref: matrix_backspace_bottom
+          shift: [-0.5 (kx + px), 0]
+        - ref: matrix_backspace_top
           shift: [-0.5 (kx + px), 0]
   patch_inner:
     - what: polygon
       points:
-        - ref: matrix_inner_top
+        - ref: matrix_inner2_top
+          shift: [0.5 (kx + px), 0]
+        - ref: matrix_inner2_bottom
           shift: [0.5 (kx + px), 0]
         - ref: matrix_inner_bottom
-          shift: [0.5 (kx + px), 0]
-        - ref: matrix_index_bottom
-        - ref: matrix_index_top
+        - ref: matrix_inner_top
   controller_area:
     - what: rectangle
       where:
-        - ref: matrix_inner_top
+        - ref: matrix_inner2_top
           # re-tranalte to new anchor position
-          shift: [76.5/2 - 3.9 ky, 32 + .5kx]
-      size: [76.5, 32]
+          shift: [32/2 + 0 kx, 76.5/2 - 4.05 ky]
+      size: [32, 76.5]
       corner: px
   switches:
     - what: rectangle
@@ -146,7 +151,7 @@ outlines:
     top_right:
       what: circle
       where:
-        - ref: matrix_inner_top
+        - ref: matrix_inner2_top
           shift: [-0.5 kx, 0]
       radius: 1.05
     palm:
@@ -208,7 +213,6 @@ pcbs:
         what: choc
         where:
           - /matrix_.*/
-          - /thumbfan_.*/
         params:
           hotswap: true
           reverse: true
@@ -219,7 +223,6 @@ pcbs:
         what: diode
         where:
           - /matrix_.*/
-          - /thumbfan_.*/
         adjust.shift: [0, -5]
         params:
           from: "{{colrow}}"
@@ -229,33 +232,37 @@ pcbs:
         where:
           ref:
             - matrix_inner2_top
-          shift: [0, 11]
-          rotate: 0
+          shift: [20, -11]
+          rotate: 270
         params:
           orientation: up
+          P3: row_number
           P4: row_top
           P5: row_home
           P6: row_bottom
-          P7: row_thumb
-          P14: col_inner
-          P15: col_index
-          P18: col_middle
-          P19: col_ring
-          P20: col_pinky
+          P7: row_ctrl
+          P10: col_inner2
+          P16: col_inner
+          P14: col_index
+          P15: col_middle
+          P18: col_ring
+          P19: col_pinky
+          P20: col_caps
+          P21: col_backspace
       mcu_r:
         what: promicro
         where:
           ref:
-            - matrix_inner_top
-          shift: [0, 12.25]
-          rotate: 180
+            - matrix_inner2_top
+          shift: [22.5, -12.25]
+          rotate: 270
         params:
           orientation: down
       pad_plus:
         what: pad
         where:
           ref:
-            - matrix_inner_top
+            - matrix_inner2_top
           shift: [23, -6]
           rotate: 0
         params:
@@ -269,7 +276,7 @@ pcbs:
         what: pad
         where:
           ref:
-            - matrix_inner_top
+            - matrix_inner2_top
           shift: [23, -3]
           rotate: 0
         params:
@@ -283,7 +290,7 @@ pcbs:
         what: trrs_tight
         where:
           ref:
-            - matrix_inner_bottom
+            - matrix_inner2_bottom
           shift: [32, -15]
           rotate: 270
         params:
@@ -298,7 +305,7 @@ pcbs:
         what: jumper
         where:
           ref:
-            - matrix_inner_bottom
+            - matrix_inner2_bottom
           shift: [23.5, 0]
           rotate: 270
         params:
@@ -309,7 +316,7 @@ pcbs:
         what: jumper
         where:
           ref:
-            - matrix_inner_bottom
+            - matrix_inner2_bottom
           shift: [23.5, 0]
           rotate: 270
         params:
@@ -320,7 +327,7 @@ pcbs:
         what: slider_threeway
         where:
           ref:
-            - matrix_inner_bottom
+            - matrix_inner2_bottom
           shift: [30, 0]
           rotate: 270
         params:
@@ -332,7 +339,7 @@ pcbs:
         what: slider_threeway
         where:
           ref:
-            - matrix_inner_bottom
+            - matrix_inner2_bottom
           shift: [30, 0]
           rotate: 270
         params:
@@ -340,21 +347,21 @@ pcbs:
           from: RAW
           left: ''
           right: Bplus
-      # reset:
-      #   what: reset_button
-      #   where:
-      #     ref:
-      #       - matrix_inner_bottom
-      #     shift: [17, 0]
-      #     rotate: 270
-      #   params:
-      #     from: GND
-      #     to: RST
+      reset:
+        what: reset_button
+        where:
+          ref:
+            - matrix_inner2_bottom
+          shift: [17, 0]
+          rotate: 270
+        params:
+          from: GND
+          to: RST
       info_l:
         what: text
         where:
           ref:
-            - matrix_pinky_bottom
+            - matrix_backspace_bottom
           shift: [0.75 kx, 0]
         params:
           text: "samoklava v0.3\\nby soundmonster"
@@ -363,7 +370,7 @@ pcbs:
         what: text
         where:
           ref:
-            - matrix_pinky_bottom
+            - matrix_backspace_bottom
           shift: [0.75 kx, 0]
         params:
           layer: B.SilkS
