@@ -109,8 +109,8 @@ outlines:
       where:
         - ref: matrix_inner_top
           # re-tranalte to new anchor position
-          shift: [32/2 + 0 kx, 76.5/2 - 4.05 ky]
-      size: [32, 76.5]
+          shift: [76.5/2 - 3.9 ky, 32 + .5kx]
+      size: [76.5, 32]
       corner: px
   switches:
     - what: rectangle
@@ -228,9 +228,9 @@ pcbs:
         what: promicro
         where:
           ref:
-            - matrix_inner_top
-          shift: [20, -11]
-          rotate: 270
+            - matrix_inner2_top
+          shift: [0, 11]
+          rotate: 0
         params:
           orientation: up
           P4: row_top
@@ -247,8 +247,8 @@ pcbs:
         where:
           ref:
             - matrix_inner_top
-          shift: [22.5, -12.25]
-          rotate: 270
+          shift: [0, 12.25]
+          rotate: 180
         params:
           orientation: down
       pad_plus:
@@ -340,16 +340,16 @@ pcbs:
           from: RAW
           left: ''
           right: Bplus
-      reset:
-        what: reset_button
-        where:
-          ref:
-            - matrix_inner_bottom
-          shift: [17, 0]
-          rotate: 270
-        params:
-          from: GND
-          to: RST
+      # reset:
+      #   what: reset_button
+      #   where:
+      #     ref:
+      #       - matrix_inner_bottom
+      #     shift: [17, 0]
+      #     rotate: 270
+      #   params:
+      #     from: GND
+      #     to: RST
       info_l:
         what: text
         where:

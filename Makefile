@@ -4,7 +4,7 @@
 .DEFAULT: all
 
 container_cmd ?= docker
-container_args ?= -w /board -v $(shell pwd):/board --rm
+container_args ?= -w /board -v $(shell cygpath -w `pwd`):/board --rm
 
 setup:
 	npm install
