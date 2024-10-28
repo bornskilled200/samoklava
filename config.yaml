@@ -235,7 +235,7 @@ pcbs:
           from: "{{colrow}}"
           to: "{{row_net}}"
       mcu_l:
-        what: promicro
+        what: promicro_flippable
         where:
           ref:
             - matrix_inner2_top
@@ -257,7 +257,7 @@ pcbs:
           P20: col_caps
           P21: col_backspace
       mcu_r:
-        what: promicro
+        what: promicro_flippable
         where:
           ref:
             - matrix_inner2_top
@@ -265,6 +265,7 @@ pcbs:
           rotate: 0
         params:
           orientation: down
+          silk_layer: F.SilkS
       # pad_plus:
       #   what: pad
       #   where:
@@ -383,4 +384,15 @@ pcbs:
           layer: B.SilkS
           text: "orthosplit75 v0.1\\nby unseenforce"
           justify: right mirror
-
+cases:
+  plate_stl:
+    - name: plate
+      operation: add
+      extrude: 1.2
+  pcb_stl:
+    - name: base_outline
+      operation: add
+      extrude: 1.6
+    - name: switches
+      operation: subtract
+      extrude: 1.6

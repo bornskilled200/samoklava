@@ -60,7 +60,5 @@ all: \
 	output/pcbs/board-back.png \
 	output/routed_pcbs/board-front.png \
 	output/routed_pcbs/board-back.png \
-	output/gerbers/top_plate/gerbers.zip \
-	output/gerbers/bottom_plate/gerbers.zip \
 	output/gerbers/board/gerbers.zip
 
