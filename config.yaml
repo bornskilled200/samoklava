@@ -234,7 +234,7 @@ pcbs:
         params:
           from: "{{colrow}}"
           to: "{{row_net}}"
-      mcu_l:
+      mcu_r:
         what: promicro_flippable
         where:
           ref:
@@ -243,6 +243,7 @@ pcbs:
           rotate: 0
         params:
           orientation: up
+          silk_layer: B.SilkS
           P3: row_number
           P4: row_top
           P5: row_home
@@ -256,7 +257,7 @@ pcbs:
           P19: col_pinky
           P20: col_caps
           P21: col_backspace
-      mcu_r:
+      mcu_l:
         what: promicro_flippable
         where:
           ref:
@@ -266,34 +267,34 @@ pcbs:
         params:
           orientation: down
           silk_layer: F.SilkS
-      # pad_plus:
-      #   what: pad
-      #   where:
-      #     ref:
-      #       - matrix_inner2_top
-      #     shift: [-6, 23]
-      #     rotate: 0
-      #   params:
-      #     front: true
-      #     back: true
-      #     width: 1.5
-      #     height: 1.5
-      #     text: "B+"
-      #     net: Bplus
-      # pad_minus:
-      #   what: pad
-      #   where:
-      #     ref:
-      #       - matrix_inner2_top
-      #     shift: [-3, 23]
-      #     rotate: 0
-      #   params:
-      #     front: true
-      #     back: true
-      #     width: 1.5
-      #     height: 1.5
-      #     text: "B-"
-      #     net: GND
+#      pad_plus:
+#        what: pad
+#        where:
+#          ref:
+#            - matrix_inner_top
+#          shift: [23, -6]
+#          rotate: 0
+#        params:
+#          front: true
+#          back: true
+#          width: 1.5
+#          height: 1.5
+#          text: "B+"
+#          net: Bplus
+#      pad_minus:
+#        what: pad
+#        where:
+#          ref:
+#            - matrix_inner_top
+#          shift: [23, -3]
+#          rotate: 0
+#        params:
+#          front: true
+#          back: true
+#          width: 1.5
+#          height: 1.5
+#          text: "B-"
+#          net: GND
       trrs:
         what: trrs_tight
         where:
