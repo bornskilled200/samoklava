@@ -10,8 +10,13 @@ setup:
 	npm install
 
 # outputs from 
-output/pcbs/board.kicad_pcb output/pcbs/top_plate.kicad_pcb output/pcbs/bottom_plate.kicad_pcb &: config.yaml
+output/pcbs/board.kicad_pcb output/pcbs/top_plate.kicad_pcb output/pcbs/bottom_plate.kicad_pcb output/cases/plate_stl.jscad output/cases/case_stl.jscad &: config.yaml
 	npm run gen
+
+output/cases/%.stl: output/cases/%.jscad
+	# file can not be present or the script will refuse to run
+	mkdir -p $(shell dirname $@)
+	npx openjscad $< -o $@
 
 output/pcbs/%.dsn: output/pcbs/%.kicad_pcb
 	# file can not be present or the script will refuse to run
@@ -56,6 +61,8 @@ clean:
 	rm -rf output
 
 all: \
+	output/cases/plate_stl.stl \
+	output/cases/case_stl.stl \
 	output/pcbs/board-front.png \
 	output/pcbs/board-back.png \
 	output/routed_pcbs/board-front.png \
