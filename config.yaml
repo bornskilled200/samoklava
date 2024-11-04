@@ -91,6 +91,17 @@ outlines:
       asym: source
       size: [kx + px, ky + py]
       corner: px
+  raw_unfileted:
+    - what: rectangle
+      where: true
+      asym: source
+      size: [kx + px + .4, ky + py + .4]
+  raw_wall:
+    - what: rectangle
+      where: true
+      asym: source
+      size: [kx + px + 2.4, ky + py + 2.4]
+      corner: px
   # patch_outer:
   #   - what: polygon
   #     points:
@@ -117,6 +128,21 @@ outlines:
           shift: [-56/2 + .5kx + 1, 30/2 + 1.5ky - 3]
       size: [56, 30]
       corner: px
+  controller_area_unfileted:
+    - what: rectangle
+      where:
+        - ref: matrix_inner2_top
+          # re-tranalte to new anchor position
+          shift: [-56/2 + .5kx + 1, 30/2 + 1.5ky - 3]
+      size: [56.4, 30.4]
+  controller_area_wall:
+    - what: rectangle
+      where:
+        - ref: matrix_inner2_top
+          # re-tranalte to new anchor position
+          shift: [-56/2 + .5kx + 1, 30/2 + 1.5ky - 3]
+      size: [58.4, 32.4]
+      corner: px
   # patch_controller:
   #   - what: polygon
   #     points:
@@ -141,6 +167,10 @@ outlines:
   base_outline:
     - "keywell"
     - "+controller_area"
+    # - "+patch_controller"
+  base_outline_unfileted:
+    - "raw_unfileted"
+    - "+controller_area_unfileted"
     # - "+patch_controller"
   screw_holes:
     top_left:
@@ -177,6 +207,9 @@ outlines:
       radius: 2.05
     palm:
       radius: 2.05
+  wall:
+    - "raw_wall"
+    - "controller_area_wall"
   bottom_outline:
     - "base_outline"
     # TODO use footprints with pad + via reinforcement as mounting holes
@@ -390,10 +423,35 @@ cases:
     - name: plate
       operation: add
       extrude: 1.2
-  pcb_stl:
+  base_stl:
     - name: base_outline
       operation: add
       extrude: 1.6
-    - name: switches
+  total_area:
+    - name: raw_wall
+      operation: add
+      extrude: 7 # floor thickness 1mm, 6mm for height
+    - name: controller_area_wall
+      operation: add
+      extrude: 7 # floor thickness 1mm, 6mm for height
+  inner_wall: 
+    - name: base_outline_unfileted
+      extrude:  7 # floor thickness 1mm, 6mm for height
+  wall:
+    - what: case
+      name: total_area
+      operation: add
+    - what: case
+      name: inner_wall
       operation: subtract
-      extrude: 1.6
+  floor:
+    - name: base_outline_unfileted
+      operation: add
+      extrude: 1
+  case_stl:
+    - what: case
+      name: wall
+      operation: add
+    - what: case
+      name: floor
+      operation: add

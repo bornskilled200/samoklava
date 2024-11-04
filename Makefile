@@ -10,7 +10,7 @@ setup:
 	npm install
 
 # outputs from 
-output/pcbs/board.kicad_pcb output/pcbs/top_plate.kicad_pcb output/pcbs/bottom_plate.kicad_pcb output/cases/plate_stl.jscad output/cases/case_stl.jscad &: config.yaml
+output/pcbs/board.kicad_pcb output/pcbs/top_plate.kicad_pcb output/pcbs/bottom_plate.kicad_pcb output/cases/plate_stl.jscad output/cases/case_stl.jscad output/cases/base_stl.jscad &: config.yaml
 	npm run gen
 
 output/cases/%.stl: output/cases/%.jscad
@@ -63,6 +63,7 @@ clean:
 all: \
 	output/cases/plate_stl.stl \
 	output/cases/case_stl.stl \
+	output/cases/base_stl.stl \
 	output/pcbs/board-front.png \
 	output/pcbs/board-back.png \
 	output/routed_pcbs/board-front.png \
