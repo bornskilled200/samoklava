@@ -12,17 +12,18 @@ const openjscadCli = path.resolve(require.resolve('@jscad/openjscad'), '../cli/c
   const generatePcbImage = spawnPcbImageProcess();
   // await once(fork(ergogenCli, ['-d', '.'], {}), 'close');
 
-  generatePcbImage('pcbs/board');
-  // await Promise.all([
-  //   ...['case_stl', 'base_stl', 'plate_stl']
-  //     .map(file => once(fork(openjscadCli, [`output/cases/${file}.jscad`, '-o', `output/cases/${file}.stl`], {}), 'close')),
-  //   pcbImage('pcbs/board'),
-  //   routePcb(),
-  // ]);;
+  // await generatePcbImage('pcbs/board');
+  await Promise.all([
+    ...['case_stl', 'base_stl', 'plate_stl']
+      .map(file => once(fork(openjscadCli, [`output/cases/${file}.jscad`, '-o', `output/cases/${file}.stl`], {}), 'close')),
+    generatePcbImage('pcbs/board'),
+    routePcb(generatePcbImage),
+  ]);;
   process.exit();
 })();
 
 function spawnPcbImageProcess() {
+  const spawnMessage = 'pcbImageProcess spawned';
   const pcbImageProcess = spawn('docker', [
     'run',
     '-i',
@@ -32,11 +33,11 @@ function spawnPcbImageProcess() {
     '--entrypoint', '/bin/bash',
     'yaqwsx/kikit:v1.3.0',
     '-c',
-    '"echo pcbImageProcess spawned; /bin/bash"',
+    `"echo ${spawnMessage}; /bin/bash"`,
   ], { shell: true });
   const spawnedPromise = new Promise(resolve => {
     const listener = (data) => {
-      if (data.includes('pcbImageProcess spawned')) {
+      if (data.includes(spawnMessage)) {
         resolve();
         pcbImageProcess.stdout.off('data', listener);
       }
@@ -83,33 +84,7 @@ function spawnPcbImageProcess() {
 }
 
 
-async function pcbImage(pcbPath) {
-  await Promise.all(['front', 'back'].map(async side => {
-    const docker = spawn('docker', [
-      'run',
-      '-w /board',
-      `-v ${__dirname}:/board`,
-      '--rm',
-      '--entrypoint', '/usr/local/bin/pcbdraw',
-      'yaqwsx/kikit:v1.3.0',
-      'plot',
-      '--side', side,
-      '--style', 'oshpark-afterdark',
-      `output/${pcbPath}.kicad_pcb`,
-      `output/${pcbPath}-${side}.png`,
-      ], { shell: true });
-    docker.stdout.on('data', (data) => {
-      console.log(`stdout: ${data}`);
-    });
-    docker.stderr.on('data', (data) => {
-      console.error(`stderr: ${data}`);
-    });
-    await once(docker, 'close');
-  }));
-}
-
-
-async function routePcb() {
+async function routePcb(pcbImage) {
   await Promise.all([convertKicadPcbToDSN(), fs.mkdir('output/routed_pcbs', { recursive: true })]);
   await freeRouting();
   await reimportAsKicadPcb();
