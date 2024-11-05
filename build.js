@@ -9,14 +9,79 @@ const ergogenCli = path.resolve(require.resolve('ergogen'), '../cli.js');
 const openjscadCli = path.resolve(require.resolve('@jscad/openjscad'), '../cli/cli.js');
 
 (async () => {
-  await once(fork(ergogenCli, ['-d', '.'], {}), 'close');
+  const generatePcbImage = spawnPcbImageProcess();
+  // await once(fork(ergogenCli, ['-d', '.'], {}), 'close');
 
-  await Promise.all([
-    ...['case_stl', 'base_stl', 'plate_stl'].map(file => once(fork(openjscadCli, [`output/cases/${file}.jscad`, '-o', `output/cases/${file}.stl`], {}), 'close')),
-    pcbImage('pcbs/board'),
-    routePcb(),
-  ]);;
+  generatePcbImage('pcbs/board');
+  // await Promise.all([
+  //   ...['case_stl', 'base_stl', 'plate_stl']
+  //     .map(file => once(fork(openjscadCli, [`output/cases/${file}.jscad`, '-o', `output/cases/${file}.stl`], {}), 'close')),
+  //   pcbImage('pcbs/board'),
+  //   routePcb(),
+  // ]);;
+  process.exit();
 })();
+
+function spawnPcbImageProcess() {
+  const pcbImageProcess = spawn('docker', [
+    'run',
+    '-i',
+    '-w /board',
+    `-v ${__dirname}:/board`,
+    '--rm',
+    '--entrypoint', '/bin/bash',
+    'yaqwsx/kikit:v1.3.0',
+    '-c',
+    '"echo pcbImageProcess spawned; /bin/bash"',
+  ], { shell: true });
+  const spawnedPromise = new Promise(resolve => {
+    const listener = (data) => {
+      if (data.includes('pcbImageProcess spawned')) {
+        resolve();
+        pcbImageProcess.stdout.off('data', listener);
+      }
+    };
+    pcbImageProcess.stdout.on('data', listener);
+  });
+
+  pcbImageProcess.stdout.on('data', (data) => {
+    console.log(`stdout: ${data}`);
+  });
+  pcbImageProcess.stderr.on('data', (data) => {
+    console.error(`stderr: ${data}`);
+  });
+  pcbImageProcess.stdin.setEncoding('utf8');
+  process.on('exit', () => {
+    pcbImageProcess.stdin.end();
+  });
+  return async (pcbPath) => {
+    await spawnedPromise;
+
+    const finishMessage = `done generating ${pcbPath} images`;
+    const imagePromise = new Promise(resolve => {
+      const listener = (data) => {
+        if (data.includes(finishMessage)) {
+          resolve();
+          pcbImageProcess.stdout.off('data', listener);
+        }
+      };
+      pcbImageProcess.stdout.on('data', listener);
+    });
+    console.log(`generating ${pcbPath} images`);
+    pcbImageProcess.stdin.write(`${['front', 'back'].map(side => [
+      '/usr/local/bin/pcbdraw',
+      'plot',
+      '--side', side,
+      '--style', 'oshpark-afterdark',
+      `output/${pcbPath}.kicad_pcb`,
+      `output/${pcbPath}-${side}.png`,
+    ].join(' ')).join(';')}; echo ${finishMessage}\n`);
+
+    await imagePromise;
+    console.log(finishMessage);
+  }
+}
+
 
 async function pcbImage(pcbPath) {
   await Promise.all(['front', 'back'].map(async side => {
