@@ -4,25 +4,64 @@ const exec = util.promisify(require('child_process').exec);
 const { fork, spawn } = require('child_process');
 const fs = require('fs/promises');
 const { once } = require('events');
+const readline = require('readline');
+const { stdin: input, stdout: output } = require('process');
 
 const ergogenCli = path.resolve(require.resolve('ergogen'), '../cli.js');
 const openjscadCli = path.resolve(require.resolve('@jscad/openjscad'), '../cli/cli.js');
 
-(async () => {
-  const generatePcbImage = spawnPcbImageProcess();
-  // await once(fork(ergogenCli, ['-d', '.'], {}), 'close');
+const generatePcbImage = spawnPcbImageProcess();
 
-  // await generatePcbImage('pcbs/board');
+const generate = (async () => {
+  fs.rm('output/pcbs/board.dsn', { force: true });
+  fs.rm('output/routed_pcbs/board.ses', { force: true });
+  fs.rm('output/routed_pcbs/board.kicad_pcb', { force: true });
+  console.log('building...');
+  await once(fork(ergogenCli, ['-d', '.'], {}), 'close');
+
   await Promise.all([
     ...['case_stl', 'base_stl', 'plate_stl']
       .map(file => once(fork(openjscadCli, [`output/cases/${file}.jscad`, '-o', `output/cases/${file}.stl`], {}), 'close')),
     generatePcbImage('pcbs/board'),
     routePcb(generatePcbImage),
-  ]);;
-  process.exit();
-})();
+  ]);
+});
+generate();
+
+process.on('exit', () => {
+  console.log('exiting');
+});
+
+const rl = readline.createInterface({ input, output });
+rl.on('line', (input) => {
+  if (input === 'exit') {
+    process.exit();
+  }
+  generate();
+});
+
+async function exists(...files) {
+  try {
+    await Promise.all(files.map(file => fs.access(file)));
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+async function retry(callback, ...files) {
+  let retryCount = 0;
+  do {
+    if (retryCount > 0) {
+      console.log(`could not find ${files[0]}, reattempting command`);
+    }
+    await callback();
+    retryCount++;
+  } while(!exists(files) && retryCount < 3);
+}
 
 function spawnPcbImageProcess() {
+  console.log('spawning pcb imager');
   const spawnMessage = 'pcbImageProcess spawned';
   const pcbImageProcess = spawn('docker', [
     'run',
@@ -38,6 +77,7 @@ function spawnPcbImageProcess() {
   const spawnedPromise = new Promise(resolve => {
     const listener = (data) => {
       if (data.includes(spawnMessage)) {
+        console.log('spawned pcb imager');
         resolve();
         pcbImageProcess.stdout.off('data', listener);
       }
@@ -46,10 +86,10 @@ function spawnPcbImageProcess() {
   });
 
   pcbImageProcess.stdout.on('data', (data) => {
-    console.log(`stdout: ${data}`);
+    // console.log(`stdout: ${data}`);
   });
   pcbImageProcess.stderr.on('data', (data) => {
-    console.error(`stderr: ${data}`);
+    // console.error(`stderr: ${data}`);
   });
   pcbImageProcess.stdin.setEncoding('utf8');
   process.on('exit', () => {
@@ -85,9 +125,9 @@ function spawnPcbImageProcess() {
 
 
 async function routePcb(pcbImage) {
-  await Promise.all([convertKicadPcbToDSN(), fs.mkdir('output/routed_pcbs', { recursive: true })]);
+  await Promise.all([retry(convertKicadPcbToDSN, 'output/pcbs/board.dsn'), fs.mkdir('output/routed_pcbs', { recursive: true })]);
   await freeRouting();
-  await reimportAsKicadPcb();
+  await retry(reimportAsKicadPcb, 'output/routed_pcbs/board.kicad_pcb');
   await Promise.all([gerbers(), fs.mkdir('output/gerbers', { recursive: true }), pcbImage('routed_pcbs/board')]);
 }
 
