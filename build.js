@@ -14,7 +14,7 @@ const [generatePcbImage, generateGerber] = spawnPcbImageProcess();
 const [exportDsn, importSes] = spawnConvertKicadPcbToDSNProcess();
 const freeRouting = freeRoutingProcess();
 
-const generate = (async () => {
+const generate = (async (input) => {
   fs.rm('output/pcbs/board.dsn', { force: true });
   fs.rm('output/routed_pcbs/board.ses', { force: true });
   fs.rm('output/routed_pcbs/board.kicad_pcb', { force: true });
@@ -24,13 +24,12 @@ const generate = (async () => {
   await once(fork(ergogenCli, ['-d', '.'], {}), 'close');
 
   await Promise.all([
-    ...['case_stl', 'base_stl', 'plate_stl']
-      .map(file => once(fork(openjscadCli, [`output/cases/${file}.jscad`, '-o', `output/cases/${file}.stl`], {}), 'close')),
-    generatePcbImage('pcbs/board'),
-    routePcb(),
+    ...(!['all', 'stl'].includes(input) ? [] : ['case_stl', 'base_stl', 'plate_stl', 'tester_stl']
+      .map(file => once(fork(openjscadCli, [`output/cases/${file}.jscad`, '-o', `output/cases/${file}.stl`], {}), 'close'))),
+    ...(['all', 'pic'].includes(input) ? [] : [generatePcbImage('pcbs/board')]),
+    ...(input === 'all' ? [routePcb()] : []),
   ]);
 });
-generate();
 
 process.on('exit', () => {
   console.log('exiting');
@@ -40,12 +39,16 @@ process.on('SIGINT', () => {
   process.exit();
 });
 
+let lastInput = 'stl';
+generate(lastInput);
 const rl = readline.createInterface({ input, output });
 rl.on('line', (input) => {
   if (input === 'exit') {
     process.exit();
   }
-  generate();
+  console.log(input);
+  generate(lastInput = input || lastInput);
+  console.log(lastInput);
 });
 
 rl.on("SIGINT", function () {
@@ -65,7 +68,7 @@ async function retry(callback, ...files) {
   let retryCount = 0;
   do {
     if (retryCount > 0) {
-      console.log(`could not find ${files[0]}, reattempting command`);
+      console.log(`could not find ${files[0]}, command attempted ${retryCount} times`);
     }
     await callback();
     retryCount++;
@@ -92,6 +95,7 @@ async function spawnDockerImage(identifier, image) {
     '-i',
     '-w /board',
     `-v ${__dirname}:/board`,
+    `-v ${__dirname}\\tmp:/tmp`,
     '--rm',
     '--entrypoint', '/bin/bash',
     image,
@@ -100,18 +104,20 @@ async function spawnDockerImage(identifier, image) {
   ], { shell: true });
   const spawnedPromise = onceMessage(pcbImageProcess, spawnMessage);
 
-  // pcbImageProcess.stdout.on('data', (data) => {
-  //   console.log(`stdout: ${data}`);
-  // });
-  // pcbImageProcess.stderr.on('data', (data) => {
-  //   console.error(`stderr: ${data}`);
-  // });
+  pcbImageProcess.stdout.on('data', (data) => {
+    console.log(`stdout: ${data}`);
+  });
+  pcbImageProcess.stderr.on('data', (data) => {
+    console.error(`stderr: ${data}`);
+  });
   pcbImageProcess.stdin.setEncoding('utf8');
   process.on('exit', () => {
     pcbImageProcess.stdin.end();
+    pcbImageProcess.disconnect();
   });
   process.on('SIGINT', () => {
     pcbImageProcess.stdin.end();
+    pcbImageProcess.disconnect();
   });
   await spawnedPromise;
   return pcbImageProcess;
@@ -190,7 +196,7 @@ function spawnConvertKicadPcbToDSNProcess() {
     const finishMessage = 'export dsn done';
     const onceMessagePromise = onceMessage(converterProcess, finishMessage);
     converterProcess.stdin.write([
-      '/usr/lib/python2.7/dist-packages/kicad-automation/pcbnew_automation/export_dsn.py output/pcbs/board.kicad_pcb output/pcbs/board.dsn', // add --record to record a video
+      '/usr/lib/python2.7/dist-packages/kicad-automation/pcbnew_automation/export_dsn.py --record output/pcbs/board.kicad_pcb output/pcbs/board.dsn', // add --record to record a video
       `echo ${finishMessage}\n`,
     ].join('; '));
     await onceMessagePromise;
