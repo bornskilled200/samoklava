@@ -13,8 +13,10 @@ units:
   key_y: cy
   padding_x: 2
   padding_y: 2
+  slop_xy: .2
   slop_x: .2
   slop_y: .2
+  wall_xy: 2
 points:
   key:
     footprints:
@@ -104,38 +106,27 @@ outlines:
           shift: [(key_x/2 + padding_x), -(key_x/2 + padding_y)]
         - ref: matrix_inner2_number # top right
           shift: [(key_x/2 + padding_x), (key_x/2 + padding_y)]
-  raw_unfileted:
-    - what: rectangle
-      where: true
-      asym: source
-      size: [kx + px + .4, ky + py + .4]
+  raw_with_controller:
+    - $extends: outlines.raw.0
+      points:
+        - $extends: outlines.raw.0.points.0
+        - $extends: outlines.raw.0.points.1
+        - $extends: outlines.raw.0.points.2
+        - $extends: outlines.raw.0.points.3
+        - ref: matrix_inner2_number # controller top right
+          shift: [(key_x/2 + padding_x), (key_x/2 + 26)]
+        - ref: matrix_inner2_number # controller top left
+          shift: [(key_x/2 + padding_x - 57), (key_x/2 + 26)]
+        - ref: matrix_inner2_number # controller bottom left
+          shift: [(key_x/2 + padding_x - 57), (key_x/2 + padding_y)]
+  raw_with_controller_and_slop:
+    - what: outline
+      name: raw_with_controller
+      expand: slop_xy
   raw_wall:
     - what: outline
-      name: raw
-      expand: 2
-  controller_area:
-    - what: rectangle
-      where:
-        - ref: matrix_inner2_top
-          # re-tranalte to new anchor position
-          shift: [-56/2 + .5kx + 1, 30/2 + 1.5ky - 3]
-      size: [56, 30]
-      corner: px
-  controller_area_unfileted:
-    - what: rectangle
-      where:
-        - ref: matrix_inner2_top
-          # re-tranalte to new anchor position
-          shift: [-56/2 + .5kx + 1, 30/2 + 1.5ky - 3]
-      size: [56.4, 30.4]
-  controller_area_wall:
-    - what: rectangle
-      where:
-        - ref: matrix_inner2_top
-          # re-tranalte to new anchor position
-          shift: [-56/2 + .5kx + 1, 30/2 + 1.5ky - 3]
-      size: [58.4, 32.4]
-      corner: px
+      name: raw_with_controller
+      expand: wall_xy
   switches:
     - what: rectangle
       where: true
@@ -198,13 +189,9 @@ outlines:
     # - "+patch_inner"
     # - "+patch_outer"
   base_outline:
-    - "keywell"
-    - "+controller_area"
-    # - "+patch_controller"
-  base_outline_unfileted:
-    - "raw_unfileted"
-    - "+controller_area_unfileted"
-    # - "+patch_controller"
+    - "raw_with_controller"
+  base_outline_with_slop:
+    - "raw_with_controller_and_slop"
   screw_holes:
     top_left:
       what: circle
@@ -234,7 +221,6 @@ outlines:
       radius: 2.05
   wall:
     - "raw_wall"
-    - "controller_area_wall"
   bottom_outline:
     - "base_outline"
     # TODO use footprints with pad + via reinforcement as mounting holes
@@ -501,11 +487,8 @@ cases:
     - name: raw_wall
       operation: add
       extrude: 7 # floor thickness 1mm, 6mm for height
-    - name: controller_area_wall
-      operation: add
-      extrude: 7 # floor thickness 1mm, 6mm for height
   inner_wall: 
-    - name: base_outline_unfileted
+    - name: base_outline_with_slop
       extrude:  7 # floor thickness 1mm, 6mm for height
   wall:
     - what: case
@@ -515,7 +498,7 @@ cases:
       name: inner_wall
       operation: subtract
   floor:
-    - name: base_outline_unfileted
+    - name: base_outline_with_slop
       operation: add
       extrude: 1
   case_stl:
