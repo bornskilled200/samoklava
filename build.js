@@ -24,9 +24,9 @@ const generate = (async (input) => {
   await once(fork(ergogenCli, ['-d', '.'], {}), 'close');
 
   await Promise.all([
-    ...(!['all', 'stl'].includes(input) ? [] : ['case_stl', 'base_stl', 'plate_stl', 'tester_stl']
+    ...(!['all', 'stl'].includes(input) ? [] : ['case_stl', 'base_stl', 'left_plate_stl', 'right_plate_stl', 'tester_stl', 'switch_test_stl']
       .map(file => once(fork(openjscadCli, [`output/cases/${file}.jscad`, '-o', `output/cases/${file}.stl`], {}), 'close'))),
-    ...(['all', 'pic'].includes(input) ? [] : [generatePcbImage('pcbs/board')]),
+    ...(!['all', 'pic'].includes(input) ? [] : [generatePcbImage('pcbs/board')]),
     ...(input === 'all' ? [routePcb()] : []),
   ]);
 });
@@ -113,11 +113,11 @@ async function spawnDockerImage(identifier, image) {
   pcbImageProcess.stdin.setEncoding('utf8');
   process.on('exit', () => {
     pcbImageProcess.stdin.end();
-    pcbImageProcess.disconnect();
+    pcbImageProcess.kill();
   });
   process.on('SIGINT', () => {
     pcbImageProcess.stdin.end();
-    pcbImageProcess.disconnect();
+    pcbImageProcess.kill();
   });
   await spawnedPromise;
   return pcbImageProcess;

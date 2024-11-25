@@ -158,7 +158,48 @@ outlines:
     - what: rectangle
       where: true
       asym: source
-      size: [14.5, 13.8] # mm
+      size: [14.7, 13.8] # mm 14.5 + .2 for slop
+  unused_left_switches:
+    backspace_ctrl:
+      what: rectangle
+      size: 14.7 # mm
+      where:
+        - ref: matrix_backspace_ctrl
+    backspace_bottom:
+      what: rectangle
+      size: 14.7 # mm
+      where:
+        - ref: matrix_backspace_bottom
+    backspace_home:
+      what: rectangle
+      size: 14.7 # mm
+      where:
+        - ref: matrix_backspace_home
+    backspace_top:
+      what: rectangle
+      size: 14.7 # mm
+      where:
+        - ref: matrix_backspace_top
+    backspace_number:
+      what: rectangle
+      size: 14.7 # mm
+      where:
+        - ref: matrix_backspace_number
+  unused_right_switches:
+    backspace_bottom:
+      what: rectangle
+      size: 14.7 # mm
+      where:
+        - ref: matrix_backspace_bottom
+  switches_test_wall:
+    - what: rectangle
+      size: [16.7, 15.8] # mm 14.5 + .2 for slop
+  switches_test:
+    - what: rectangle
+      size: 13.8
+  switches_clip_test:
+    - what: rectangle
+      size: [14.7, 13.8] # mm 14.5 + .2 for slop
   keycaps:
     - what: rectangle 
       where: true
@@ -215,6 +256,11 @@ outlines:
     - "keywell"
     - "-switches"
     - "-screw_holes"
+  left_plate:
+    - "keywell"
+    - "-switches"
+    - "-screw_holes"
+    - "unused_left_switches"
   pcb:
     - "base_outline"
     # TODO use footprints with pad + via reinforcement as mounting holes
@@ -416,13 +462,41 @@ pcbs:
           text: "orthosplit75 v0.2\\nby unseenforce"
           justify: right mirror
 cases:
-  plate_stl:
+  left_plate_rotated_stl:
     - name: plate
       operation: add
       extrude: 2.2
     - name: switches_clip
       operation: subtract
-      shift: [0, 0, 1.3]
+      extrude: 0.92 # + .2 for slop
+    - name: unused_left_switches
+      operation: add
+      extrude: 2.2
+  left_plate_stl:
+    - what: case
+      name: left_plate_rotated_stl
+      rotate: [180, 0, 0]
+  right_plate_stl:
+    - name: plate
+      operation: add
+      extrude: 2.2
+    - name: switches_clip
+      operation: subtract
+      shift: [0, 0, 1.28] # -.2 for slop
+      extrude: 0.9
+    - name: unused_right_switches
+      operation: add
+      extrude: 2.2
+  switch_test_stl:
+    - name: switches_test_wall
+      operation: add
+      extrude: 2.2
+    - name: switches_test
+      operation: subtract
+      extrude: 2.2
+    - name: switches_clip_test
+      operation: subtract
+      shift: [0, 0, 1.28] # -.2 for slop
       extrude: 0.9
   tester_stl:
     - name: plate
