@@ -9,6 +9,12 @@ units:
   ky: cy
   px: 2
   py: 2
+  key_x: cx
+  key_y: cy
+  padding_x: 2
+  padding_y: 2
+  slop_x: .2
+  slop_y: .2
 points:
   key:
     footprints:
@@ -86,40 +92,27 @@ points:
 outlines:
   # board dimensions according to JLCPCB: 122.28 mm x 101.05 mm
   raw:
-    - what: rectangle
-      where: true
+    - what: polygon
       asym: source
-      size: [kx + px, ky + py]
       fillet: px
+      points:
+        - ref: matrix_backspace_number # top left
+          shift: [-(key_x/2 + padding_x), key_x/2 + padding_y]
+        - ref: matrix_backspace_ctrl # bottom left
+          shift: [-(key_x/2 + padding_x), -(key_x/2 + padding_y)]
+        - ref: matrix_inner2_ctrl # bottom right
+          shift: [(key_x/2 + padding_x), -(key_x/2 + padding_y)]
+        - ref: matrix_inner2_number # top right
+          shift: [(key_x/2 + padding_x), (key_x/2 + padding_y)]
   raw_unfileted:
     - what: rectangle
       where: true
       asym: source
       size: [kx + px + .4, ky + py + .4]
   raw_wall:
-    - what: rectangle
-      where: true
-      asym: source
-      size: [kx + px + 2.4, ky + py + 2.4]
-      fillet: px
-  # patch_outer:
-  #   - what: polygon
-  #     points:
-  #       - ref: matrix_pinky_top
-  #       - ref: matrix_pinky_bottom
-  #       - ref: matrix_backspace_bottom
-  #         shift: [-0.5 (kx + px), 0]
-  #       - ref: matrix_backspace_top
-  #         shift: [-0.5 (kx + px), 0]
-  # patch_inner:
-  #   - what: polygon
-  #     points:
-  #       - ref: matrix_inner2_top
-  #         shift: [0.5 (kx + px), 0]
-  #       - ref: matrix_inner2_bottom
-  #         shift: [0.5 (kx + px), 0]
-  #       - ref: matrix_inner_bottom
-  #       - ref: matrix_inner_top
+    - what: outline
+      name: raw
+      expand: 2
   controller_area:
     - what: rectangle
       where:
@@ -143,12 +136,6 @@ outlines:
           shift: [-56/2 + .5kx + 1, 30/2 + 1.5ky - 3]
       size: [58.4, 32.4]
       corner: px
-  # patch_controller:
-  #   - what: polygon
-  #     points:
-  #       - ref: controller_area
-  #       - ref: matrix_number_top
-  #       - ref: matrix_backspace_top
   switches:
     - what: rectangle
       where: true
