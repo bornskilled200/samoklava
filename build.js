@@ -39,7 +39,7 @@ process.on('SIGINT', () => {
   process.exit();
 });
 
-let lastInput = 'stl';
+let lastInput = 'all';
 generate(lastInput);
 const rl = readline.createInterface({ input, output });
 rl.on('line', (input) => {
@@ -227,6 +227,7 @@ function freeRoutingProcess() {
           console.log(`${data}`);
         }
       });
+      return process;
     });
 
   return async () => {

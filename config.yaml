@@ -171,8 +171,6 @@ outlines:
         - ref: matrix_backspace_bottom
   keywell:
     - "raw"
-    # - "+patch_inner"
-    # - "+patch_outer"
   base_outline:
     - "raw_with_controller"
   base_outline_with_slop:
@@ -260,14 +258,62 @@ pcbs:
           keycaps: true
           from: "{{colrow}}"
           to: "{{column_net}}"
-      diode:
+      # choc_via:
+      #   what: via2
+      #   where:
+      #     - /matrix_.*/
+      #   adjust:
+      #     shift: [-7, -5]
+      #   params:
+      #     net: "{{col_net}}"
+      diode_front:
         what: smd_diode
         where:
           - /matrix_.*/
-        adjust.shift: [0, -5]
+        adjust:
+          shift: [3, -5]
+          rotate: 90
         params:
           from: "{{colrow}}"
           to: "{{row_net}}"
+          front: true
+          back: false
+      diode_back:
+        what: smd_diode
+        where:
+          - /matrix_.*/
+        adjust:
+          shift: [-3, -5]
+          rotate: 90
+        params:
+          from: "{{colrow}}"
+          to: "{{row_net}}"
+          front: false
+          back: true
+      diode_via_enter:
+        what: via2
+        where:
+          - /matrix_.*/
+        adjust:
+          shift: [8, -6.5]
+        params:
+          net: "{{row_net}}"
+      diode_via_mix:
+        what: via2
+        where:
+          - /matrix_.*/
+        adjust:
+          shift: [0, -6.5]
+        params:
+          net: "{{row_net}}"
+      diode_via_exit:
+        what: via2
+        where:
+          - /matrix_.*/
+        adjust:
+          shift: [11, -6.5]
+        params:
+          net: "{{row_net}}"
       mcu_r:
         what: promicro_flippable
         where:
