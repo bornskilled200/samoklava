@@ -169,21 +169,6 @@ outlines:
       size: 14.7 # mm
       where:
         - ref: matrix_backspace_bottom
-  switches_test_wall:
-    - what: rectangle
-      size: [16.7, 15.8] # mm 14.5 + .2 for slop
-  switches_test:
-    - what: rectangle
-      size: 13.8
-  switches_clip_test:
-    - what: rectangle
-      size: [14.7, 13.8] # mm 14.5 + .2 for slop
-  keycaps:
-    - what: rectangle 
-      where: true
-      asym: source
-      size: [kx, ky] 
-      corner: 1
   keywell:
     - "raw"
     # - "+patch_inner"
@@ -316,34 +301,6 @@ pcbs:
         params:
           orientation: down
           silk_layer: F.SilkS
-#      pad_plus:
-#        what: pad
-#        where:
-#          ref:
-#            - matrix_inner_top
-#          shift: [23, -6]
-#          rotate: 0
-#        params:
-#          front: true
-#          back: true
-#          width: 1.5
-#          height: 1.5
-#          text: "B+"
-#          net: Bplus
-#      pad_minus:
-#        what: pad
-#        where:
-#          ref:
-#            - matrix_inner_top
-#          shift: [23, -3]
-#          rotate: 0
-#        params:
-#          front: true
-#          back: true
-#          width: 1.5
-#          height: 1.5
-#          text: "B-"
-#          net: GND
       trrs:
         what: trrs_tight
         where:
@@ -359,62 +316,6 @@ pcbs:
           B: VCC
           C: GND
           D: P0
-      # jumper_l:
-      #   what: jumper
-      #   where:
-      #     ref:
-      #       - matrix_inner2_bottom
-      #     shift: [0,23.5]
-      #     rotate: 270
-      #   params:
-      #     side: B
-      #     from: Bplus
-      #     to: RAW
-      # jumper_r:
-      #   what: jumper
-      #   where:
-      #     ref:
-      #       - matrix_inner2_bottom
-      #     shift: [0, 23.5]
-      #     rotate: 270
-      #   params:
-      #     side: F
-      #     from: Bplus
-      #     to: RAW
-      # slider_l:
-      #   what: slider_threeway
-      #   where:
-      #     ref:
-      #       - matrix_inner2_bottom
-      #     shift: [0, 30]
-      #     rotate: 270
-      #   params:
-      #     side: F
-      #     from: RAW
-      #     left: Bplus
-      #     right: ''
-      # slider_r:
-      #   what: slider_threeway
-      #   where:
-      #     ref:
-      #       - matrix_inner2_bottom
-      #     shift: [0, 30]
-      #     rotate: 270
-      #   params:
-      #     side: B
-      #     from: RAW
-      #     left: ''
-      #     right: Bplus
-      # reset:
-      #   what: reset_button
-      #   where:
-      #     ref:
-      #       - matrix_inner2_bottom
-      #     shift: [0, 17]
-      #     rotate: 270
-      #   params:
-      #     from: GND
-      #     to: RST
       info_l:
         what: text
         where:
@@ -460,18 +361,7 @@ cases:
     - name: unused_right_switches
       operation: add
       extrude: 2.2
-  switch_test_stl:
-    - name: switches_test_wall
-      operation: add
-      extrude: 2.2
-    - name: switches_test
-      operation: subtract
-      extrude: 2.2
-    - name: switches_clip_test
-      operation: subtract
-      shift: [0, 0, 1.28] # -.2 for slop
-      extrude: 0.9
-  tester_stl:
+  switch_tester_stl:
     - name: plate
       operation: add
       extrude: 4.85 # 2.2 + 2.65

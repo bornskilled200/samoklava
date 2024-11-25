@@ -24,7 +24,7 @@ const generate = (async (input) => {
   await once(fork(ergogenCli, ['-d', '.'], {}), 'close');
 
   await Promise.all([
-    ...(!['all', 'stl'].includes(input) ? [] : ['case_stl', 'base_stl', 'left_plate_stl', 'right_plate_stl', 'tester_stl', 'switch_test_stl']
+    ...(!['all', 'stl'].includes(input) ? [] : ['case_stl', 'base_stl', 'left_plate_stl', 'right_plate_stl', 'switch_tester_stl']
       .map(file => once(fork(openjscadCli, [`output/cases/${file}.jscad`, '-o', `output/cases/${file}.stl`], {}), 'close'))),
     ...(!['all', 'pic'].includes(input) ? [] : [generatePcbImage('pcbs/board')]),
     ...(input === 'all' ? [routePcb()] : []),
